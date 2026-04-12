@@ -17,7 +17,7 @@ import {
     ShieldAlert
 } from 'lucide-react';
 import Lottie from 'lottie-react';
-import interviewAnimation from '../assets/interview.json';
+import interviewAnimation from '../assets/Interview.json';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
