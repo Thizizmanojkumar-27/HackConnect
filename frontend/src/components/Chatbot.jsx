@@ -13,6 +13,7 @@ import {
     ChevronDown,
     Cpu
 } from 'lucide-react';
+import Bytez from "bytez.js";
 
 /**
  * Animated Robot Icon Component
@@ -136,37 +137,37 @@ const Chatbot = () => {
         if (isOpen) inputRef.current?.focus();
     }, [messages, isTyping, isOpen]);
 
-    const callGemini = async (userQuery) => {
-        if (!apiKey) {
-            return "⚠️ **Setup Required:** To enable my AI features, please configure `VITE_GEMINI_API_KEY` in your `.env` file and restart the development server.";
-        }
-
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-        const enrichedPrompt = `Context: User is at ${skillLevel} level.\nUser Message: ${userQuery}`;
-
-        const payload = {
-            contents: [{ parts: [{ text: enrichedPrompt }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] }
-        };
+    const callBytez = async (userQuery) => {
+        const testKey = "your-free-key";
+        const bytezKey = import.meta.env.VITE_BYTEZ_API_KEY || testKey;
+        const sdk = new Bytez(bytezKey);
+        const model = sdk.model("openai/gpt-5.3-chat-latest");
+        
+        const enrichedPrompt = `Context: User is at ${skillLevel} level.\nSystem Instructions: ${systemPrompt}\nUser Message: ${userQuery}`;
 
         let retries = 0;
-        const delays = [1000, 2000, 4000, 8000, 16000];
+        const delays = [1000, 2000, 4000];
 
-        while (retries < 5) {
+        while (retries < 3) {
             try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                const { error, output } = await model.run([
+                    {
+                        "role": "user",
+                        "content": enrichedPrompt
+                    }
+                ]);
 
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-                const result = await response.json();
-                return result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (error) {
+                    throw new Error(error);
+                }
+                
+                // Return output. Handle various bytez output structures cleanly.
+                if (typeof output === 'string') return output;
+                if (output?.[0]?.content) return output[0].content;
+                if (output?.choices?.[0]?.message?.content) return output.choices[0].message.content;
+                return JSON.stringify(output);
             } catch (error) {
-                if (retries === 4) throw error;
+                if (retries === 2) throw error;
                 await new Promise(resolve => setTimeout(resolve, delays[retries]));
                 retries++;
             }
@@ -188,7 +189,7 @@ const Chatbot = () => {
         setIsTyping(true);
 
         try {
-            const botResponseText = await callGemini(textToSend);
+            const botResponseText = await callBytez(textToSend);
 
             const botMessage = {
                 text: botResponseText || "System Error: Response stream interrupted. Please retry.",
