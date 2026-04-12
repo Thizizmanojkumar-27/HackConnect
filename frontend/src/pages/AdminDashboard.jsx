@@ -163,7 +163,9 @@ const AdminDashboard = () => {
             showNotification(`Admin access granted to ${adminForm.name}`);
             setAdminForm({ name: '', email: '', password: '' });
         } catch (err) {
-            showNotification('Authorization failed', 'error');
+            console.error('Admin register error:', err);
+            const errorMsg = err.response?.data || err.response?.data?.message || err.message || 'Authorization failed';
+            showNotification(`Error: ${errorMsg}`, 'error');
         }
     };
 
