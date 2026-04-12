@@ -23,10 +23,18 @@ public class DataSeeder implements CommandLineRunner {
             User admin = new User();
             admin.setName("Admin");
             admin.setEmail("admin@hackconnect.com");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setPassword(passwordEncoder.encode("superadmin"));
             admin.setRole(Role.ADMIN);
             userRepository.save(admin);
-            System.out.println("Admin user seeded: admin@hackconnect.com / admin123");
+            System.out.println("Admin user seeded: admin@hackconnect.com / superadmin");
+        } else {
+            java.util.Optional<User> adminOpt = userRepository.findByEmail("admin@hackconnect.com");
+            if (adminOpt.isPresent()) {
+                User admin = adminOpt.get();
+                admin.setPassword(passwordEncoder.encode("superadmin"));
+                userRepository.save(admin);
+                System.out.println("Admin user updated to new password: superadmin");
+            }
         }
     }
 }
