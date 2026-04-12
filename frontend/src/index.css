@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  /* bg-slate-50 */
+  color: #0f172a;
+  /* text-slate-900 */
+}
+
+.dark body {
+  background-color: #0b1120;
+  color: #f1f5f9;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  padding: 4rem 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.card-custom {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 0.75rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: #f1f5f9;
+}
+
+.card-custom:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+  /* Blue glow */
+}
+
+.btn-primary-custom {
+  background: linear-gradient(to right, #2563eb, #3b82f6);
+  border: none;
+  color: white;
+  font-weight: 500;
+}
+
+.btn-primary-custom:hover {
+  background: linear-gradient(to right, #1d4ed8, #2563eb);
+  color: white;
+}
+
+/* Auth Pages Styling */
+.auth-container {
+  max-width: 400px;
+  margin: 5rem auto;
+  padding: 2rem;
+  background: #1e293b;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.form-control-custom {
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  color: #f1f5f9;
+}
+
+.form-control-custom:focus {
+  background-color: #0f172a;
+  border-color: #3b82f6;
+  color: #f1f5f9;
+  box-shadow: none;
+}
+
+/* Chat bubble styling */
+.chat-container {
+  height: 60vh;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  background: #1e293b;
+  border-radius: 1rem;
+}
+
+.chat-bubble {
+  padding: 10px 15px;
+  border-radius: 18px;
+  margin-bottom: 10px;
+  max-width: 75%;
+  position: relative;
+  word-wrap: break-word;
+}
+
+.chat-mine {
+  background-color: #2563eb;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-other {
+  background-color: #334155;
+  color: #e2e8f0;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-meta {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-top: 4px;
+  display: block;
+  text-align: right;
+}
+
+/* Landing Page Animations */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
