@@ -200,7 +200,7 @@ const Chatbot = () => {
             setMessages(prev => [...prev, botMessage]);
         } catch (error) {
             setMessages(prev => [...prev, {
-                text: "🚨 `FETCH_ERROR`: Lost connection to mentor hub. Check API state.",
+                text: `🚨 \`ERROR\`: ${error.message || 'Lost connection to AI hub. Check API state.'}`,
                 sender: 'bot',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
