@@ -163,6 +163,7 @@ const Chatbot = () => {
                 
                 // Return output. Handle various bytez output structures cleanly.
                 if (typeof output === 'string') return output;
+                if (output?.content) return output.content;
                 if (output?.[0]?.content) return output[0].content;
                 if (output?.choices?.[0]?.message?.content) return output.choices[0].message.content;
                 return JSON.stringify(output);
