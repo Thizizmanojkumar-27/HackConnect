@@ -90,6 +90,7 @@ export default function Users() {
     const filteredUsers = useMemo(() => {
         const filtered = users.filter(user => {
             if (user.role === 'ADMIN') return false;
+            if (user.email === currentUser?.email) return false;
             
             return (
                 user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
