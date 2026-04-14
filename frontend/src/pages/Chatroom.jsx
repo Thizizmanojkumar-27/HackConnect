@@ -202,7 +202,7 @@ export default function Chatroom() {
     }
 
     return (
-        <div className="pt-16 min-h-[calc(100vh-64px)] bg-[#0b1120] text-slate-100 font-sans selection:bg-indigo-500/30">
+        <div className="pt-16 min-h-[calc(100vh-64px)] w-full overflow-x-hidden bg-[#0b1120] text-slate-100 font-sans selection:bg-indigo-500/30">
             <div className="h-full">
                 {/* Error Notification */}
                 {errorStatus && (
@@ -399,7 +399,7 @@ export default function Chatroom() {
                                 <input
                                     name="message"
                                     placeholder="Transmit sequence..."
-                                    className="flex-1 bg-slate-950/50 border border-slate-700/50 px-5 py-4 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-slate-100 placeholder:text-slate-600 shadow-inner font-medium"
+                                    className="flex-1 min-w-0 bg-slate-950/50 border border-slate-700/50 px-5 py-4 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-slate-100 placeholder:text-slate-600 shadow-inner font-medium"
                                     autoComplete="off"
                                 />
                                 <button className="bg-indigo-500 px-5 text-white rounded-2xl hover:bg-indigo-400 transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 shrink-0 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0b1120] group">
