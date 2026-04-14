@@ -244,7 +244,7 @@ export default function Chatroom() {
                                     </div>
                                 )}
                                 {rooms.map(room => (
-                                    <div key={room.id} className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-700/50 hover:border-indigo-500/50 rounded-3xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(99,102,241,0.2)] flex flex-col justify-between h-40">
+                                    <div key={room.id} className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-700/50 hover:border-indigo-500/50 rounded-3xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(99,102,241,0.2)] flex flex-col justify-between h-full min-h-[10rem]">
                                         <div className="flex justify-between items-start">
                                             <div className="flex flex-col gap-3 max-w-[80%]">
                                                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-inner ${room.password ? 'bg-rose-500/10 text-rose-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
