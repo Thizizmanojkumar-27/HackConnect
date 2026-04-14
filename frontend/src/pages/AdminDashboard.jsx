@@ -243,7 +243,7 @@ const AdminDashboard = () => {
     ];
 
     return (
-        <div className="flex min-h-screen bg-[#09090b] font-sans text-zinc-100 selection:bg-red-500 selection:text-white">
+        <div className="flex min-h-screen w-full overflow-x-hidden bg-[#09090b] font-sans text-zinc-100 selection:bg-red-500 selection:text-white">
             {/* Mobile Sidebar Overlay */}
             {isMobileMenuOpen && (
                 <div 
@@ -327,7 +327,7 @@ const AdminDashboard = () => {
                         </h1>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                         <button
                             onClick={() => {
                                 fetchHackathons();
@@ -336,7 +336,7 @@ const AdminDashboard = () => {
                                 showNotification('Data refreshed securely.', 'success');
                             }}
                             title="Refresh Data"
-                            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all group"
+                            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all group hidden sm:block"
                         >
                             <RefreshCw size={20} className="group-active:rotate-180 transition-transform duration-500" />
                         </button>
@@ -359,15 +359,15 @@ const AdminDashboard = () => {
                         </button>
                         <button
                             onClick={() => { setEditingId(null); setForm({ title: '', description: '', startDate: '', endDate: '', location: '' }); setIsFormOpen(true); }}
-                            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-semibold text-sm transition-all shadow-lg shadow-red-900/20 active:scale-95"
+                            className="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl flex items-center gap-1 sm:gap-2 font-semibold text-sm transition-all shadow-lg shadow-red-900/20 active:scale-95"
                         >
                             <Plus size={18} />
-                            New Event
+                            <span className="hidden sm:inline">New Event</span>
                         </button>
                     </div>
                 </header>
 
-                <div className="p-8 max-w-7xl mx-auto">
+                <div className="p-4 sm:p-8 max-w-7xl mx-auto">
                     {/* Notifications */}
                     {notification && (
                         <div className={`fixed top-24 right-8 z-[100] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border transition-all duration-300 ${notification.type === 'error' ? 'bg-zinc-900 border-red-500 text-red-500' : 'bg-zinc-900 border-emerald-500 text-emerald-500'
@@ -408,7 +408,7 @@ const AdminDashboard = () => {
                                 <p className="text-zinc-500 text-sm">Create a new administrative profile with controlled access.</p>
                             </div>
 
-                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-10 backdrop-blur-sm">
+                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-6 sm:p-10 backdrop-blur-sm">
                                 <form onSubmit={handleAdminRegister} className="space-y-6">
                                     <div>
                                         <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-widest">Display Name</label>
@@ -547,8 +547,8 @@ const AdminDashboard = () => {
                                 <h2 className="text-2xl font-bold">User Management</h2>
                             </div>
 
-                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2rem] overflow-hidden">
-                                <table className="w-full text-left border-collapse">
+                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2rem] overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[700px]">
                                     <thead>
                                         <tr className="border-b border-zinc-800">
                                             <th className="px-8 py-5 text-sm font-bold text-zinc-500 uppercase tracking-[0.15em]">User</th>
@@ -611,8 +611,8 @@ const AdminDashboard = () => {
                                 <h2 className="text-2xl font-bold">Registration Requests</h2>
                             </div>
 
-                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2rem] overflow-hidden">
-                                <table className="w-full text-left border-collapse">
+                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2rem] overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[700px]">
                                     <thead>
                                         <tr className="border-b border-zinc-800">
                                             <th className="px-8 py-5 text-sm font-bold text-zinc-500 uppercase tracking-[0.15em]">Participant</th>
@@ -746,7 +746,7 @@ const AdminDashboard = () => {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                     <div>
                                         <label className="block text-xs font-bold text-zinc-500 mb-3 uppercase tracking-widest">Start Date</label>
                                         <input
@@ -784,7 +784,7 @@ const AdminDashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="pt-10 flex gap-4">
+                            <div className="pt-10 flex flex-col sm:flex-row gap-4">
                                 <button
                                     type="submit"
                                     className="flex-1 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold transition-all shadow-xl shadow-red-900/20 active:scale-95"
