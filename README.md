@@ -5,16 +5,19 @@ HackConnect is a modern, full-stack web application designed to facilitate hacka
 ## 🚀 Features
 
 - **User Profiles & Authentication:** Secure JWT-based authentication. Users can create profiles showcasing their skills, certifications, GitHub, and LinkedIn links.
-- **Admin Dashboard:** A dedicated space for administrators to create, update, and manage hackathon details.
+- **Global Communications Hub (NEW):** Real-time chat system synchronized via Spring Boot backend and MySQL, allowing global communication across all active users.
+- **Progressive Web App (PWA) Support:** Installable on Android and iOS devices directly from Chrome, featuring splash screens and offline-ready manifestation.
+- **Responsive Admin Portal:** A data-heavy dashboard completely optimized for mobile devices with adaptive grids and horizontal scrolling tables.
 - **Event Discovery & Registration:** Users can browse upcoming or ongoing hackathons and submit their applications.
 - **Approval Workflow:** Streamlined process for admins to review, approve, or reject participant registrations.
 - **Interactive AI Chatbot:** An integrated smart chatbot to assist users with platform navigation and hackathon queries.
+- **Community Intelligence:** Filterable member network with specialized views for discovering collaborators.
 
 ## 🛠️ Technology Stack
 
 **Frontend**
 - React 18
-- Vite
+- Vite & PWA Standard (Service Workers, Manifest)
 - Tailwind CSS
 - Framer Motion & Lottie React (Animations)
 
