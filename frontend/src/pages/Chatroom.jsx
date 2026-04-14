@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import api from '../services/api';
 import {
     MessageSquare,
     Plus,
@@ -35,20 +36,18 @@ export default function Chatroom() {
     // Listen for Rooms
     useEffect(() => {
         if (view !== 'lobby') return;
-        const fetchRooms = () => {
-            const storedRooms = localStorage.getItem('hackconnect_chat_rooms');
-            if (storedRooms) {
-                setRooms(JSON.parse(storedRooms));
-            } else {
-                const defaultRooms = [
-                    { id: 'general', name: 'General Chat', type: 'public', password: null, creator: 'system', createdAt: Date.now() }
-                ];
-                localStorage.setItem('hackconnect_chat_rooms', JSON.stringify(defaultRooms));
-                setRooms(defaultRooms);
+        const fetchRooms = async () => {
+            try {
+                const response = await api.get('/chatrooms');
+                setRooms(response.data);
+            } catch (error) {
+                console.error("Failed to fetch rooms:", error);
+                setErrorStatus("Failed to sync secure channels.");
+                setTimeout(() => setErrorStatus(""), 3000);
             }
         };
         fetchRooms();
-        const interval = setInterval(fetchRooms, 2000);
+        const interval = setInterval(fetchRooms, 3000);
         return () => clearInterval(interval);
     }, [view]);
 
@@ -56,32 +55,30 @@ export default function Chatroom() {
     useEffect(() => {
         if (view !== 'chat' || !currentRoom) return;
 
-        const loadMessages = () => {
-            const roomKey = `hackconnect_room_${currentRoom.id}`;
-            const stored = localStorage.getItem(roomKey);
-            if (stored) {
-                const msgs = JSON.parse(stored);
-                msgs.sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
+        const loadMessages = async () => {
+            try {
+                const response = await api.get(`/chatrooms/${currentRoom.id}/messages`);
+                const msgs = response.data;
+                msgs.sort((a, b) => a.timestampSeconds - b.timestampSeconds);
                 setMessages(msgs);
-            } else {
-                setMessages([]);
+            } catch (error) {
+                console.error("Failed to fetch messages:", error);
             }
         };
 
         loadMessages();
-        const interval = setInterval(loadMessages, 1000);
+        const interval = setInterval(loadMessages, 1500);
 
-        const checkRoomInterval = setInterval(() => {
-            const storedRooms = localStorage.getItem('hackconnect_chat_rooms');
-            if (storedRooms) {
-                const parsedRooms = JSON.parse(storedRooms);
-                const stillExists = parsedRooms.find(r => r.id === currentRoom.id);
+        const checkRoomInterval = setInterval(async () => {
+            try {
+                const response = await api.get('/chatrooms');
+                const stillExists = response.data.find(r => r.id === currentRoom.id);
                 if (!stillExists) {
                     setView('lobby');
                     setCurrentRoom(null);
                 }
-            }
-        }, 2000);
+            } catch (error) {}
+        }, 3000);
 
         return () => {
             clearInterval(interval);
@@ -91,43 +88,48 @@ export default function Chatroom() {
 
 
 
-    const createRoom = (e) => {
+    const createRoom = async (e) => {
         e.preventDefault();
         const name = e.target.roomName.value;
         const pass = e.target.roomPass.value;
         if (!name.trim()) return;
 
-        const newRoom = {
-            id: Date.now().toString(),
-            name,
-            password: pass || null,
-            creator: userId,
-            createdAt: Date.now()
-        };
-
-        const storedRooms = localStorage.getItem('hackconnect_chat_rooms');
-        const parsedRooms = storedRooms ? JSON.parse(storedRooms) : [];
-        const updatedRooms = [...parsedRooms, newRoom];
-        setRooms(updatedRooms);
-        localStorage.setItem('hackconnect_chat_rooms', JSON.stringify(updatedRooms));
-        setShowCreate(false);
+        try {
+            await api.post('/chatrooms', {
+                name,
+                password: pass || null,
+                creator: userId
+            });
+            setShowCreate(false);
+            
+            // Immediate sync attempt
+            const response = await api.get('/chatrooms');
+            setRooms(response.data);
+        } catch (error) {
+            console.error("Failed to create room:", error);
+            setErrorStatus("Failed to establish secure channel.");
+            setTimeout(() => setErrorStatus(""), 3000);
+        }
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (!deletingId) return;
 
-        const storedRooms = localStorage.getItem('hackconnect_chat_rooms');
-        if (storedRooms) {
-            const parsedRooms = JSON.parse(storedRooms);
-            const updatedRooms = parsedRooms.filter(r => r.id !== deletingId);
-            setRooms(updatedRooms);
-            localStorage.setItem('hackconnect_chat_rooms', JSON.stringify(updatedRooms));
-            localStorage.removeItem(`hackconnect_room_${deletingId}`);
-        }
-
-        if (currentRoom && currentRoom.id === deletingId) {
-            setCurrentRoom(null);
-            setView('lobby');
+        try {
+            await api.delete(`/chatrooms/${deletingId}`);
+            
+            // Immediate sync attempt
+            const response = await api.get('/chatrooms');
+            setRooms(response.data);
+            
+            if (currentRoom && currentRoom.id === deletingId) {
+                setCurrentRoom(null);
+                setView('lobby');
+            }
+        } catch (error) {
+            console.error("Failed to delete room:", error);
+            setErrorStatus("Failed to decommission channel.");
+            setTimeout(() => setErrorStatus(""), 3000);
         }
 
         setDeletingId(null);
@@ -156,24 +158,29 @@ export default function Chatroom() {
         setJoinError('');
     };
 
-    const sendMessage = (e) => {
+    const sendMessage = async (e) => {
         e.preventDefault();
         const text = e.target.message.value;
         if (!text.trim() || !currentRoom) return;
         e.target.reset();
 
-        const roomKey = `hackconnect_room_${currentRoom.id}`;
-        const newMsg = {
-            id: Date.now().toString(),
-            roomId: currentRoom.id,
-            text,
-            sender: displayName,
-            senderId: userId,
-            timestamp: { seconds: Math.floor(Date.now() / 1000) }
-        };
-        const updatedMessages = [...messages, newMsg];
-        setMessages(updatedMessages);
-        localStorage.setItem(roomKey, JSON.stringify(updatedMessages));
+        try {
+            await api.post(`/chatrooms/${currentRoom.id}/messages`, {
+                text,
+                sender: displayName,
+                senderId: userId
+            });
+            
+            // Immediate sync attempt
+            const response = await api.get(`/chatrooms/${currentRoom.id}/messages`);
+            const msgs = response.data;
+            msgs.sort((a, b) => a.timestampSeconds - b.timestampSeconds);
+            setMessages(msgs);
+        } catch (error) {
+            console.error("Failed to send message:", error);
+            setErrorStatus("Transmission failed.");
+            setTimeout(() => setErrorStatus(""), 3000);
+        }
     };
 
     const chatEndRef = useRef(null);
