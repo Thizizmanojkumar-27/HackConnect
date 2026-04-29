@@ -12,6 +12,7 @@ import {
     Table as TableIcon,
     CheckCircle2,
     XCircle,
+    X,
     MessageSquare,
     Trash2,
     ShieldAlert
@@ -26,7 +27,7 @@ export default function Users() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [viewMode, setViewMode] = useState('grid');
+    const [selectedUser, setSelectedUser] = useState(null);
 
     const { user: currentUser } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -185,69 +186,50 @@ export default function Users() {
                 </div>
             </header>
 
-            <main className="w-full px-6 sm:px-10 lg:px-16 py-10 relative z-10">
+            <main className="w-full max-w-md px-4 sm:px-6 lg:px-16 py-8 relative z-10">
                 {filteredUsers.length > 0 ? (
-                    <>
-                        {viewMode === 'grid' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                                {filteredUsers.map(user => (
-                                    <DarkGlassCard
-                                        key={user.id}
-                                        user={user}
-                                        currentUser={currentUser}
-                                        onDelete={handleDeleteUser}
-                                        onConnect={handleConnect}
-                                    />
-                                ))}
-                            </div>
-                        )}
-
-                        {viewMode === 'list' && (
-                            <div className="flex flex-col gap-5">
-                                {filteredUsers.map(user => (
-                                    <DarkGlassListRow
-                                        key={user.id}
-                                        user={user}
-                                        currentUser={currentUser}
-                                        onDelete={handleDeleteUser}
-                                        onConnect={handleConnect}
-                                    />
-                                ))}
-                            </div>
-                        )}
-
-                        {viewMode === 'table' && (
-                            <div className="bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl">
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-white/[0.02] text-[10px] font-black uppercase tracking-[0.2em] text-blue-400/80">
-                                                <th className="px-8 py-6">Member Identity</th>
-                                                <th className="px-8 py-6 text-center">Expertise Stack</th>
-                                                <th className="px-8 py-6 text-center">Status</th>
-                                                <th className="px-8 py-6">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-white/[0.05]">
-                                            {filteredUsers.map(user => (
-                                                <DarkGlassTableRow
-                                                    key={user.id}
-                                                    user={user}
-                                                    currentUser={currentUser}
-                                                    onDelete={handleDeleteUser}
-                                                    onConnect={handleConnect}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        )}
-                    </>
+                    <div className="flex flex-col gap-1">
+                        {filteredUsers.map(user => (
+                            <InstagramStyleRow
+                                key={user.id}
+                                user={user}
+                                onClick={() => setSelectedUser(user)}
+                            />
+                        ))}
+                    </div>
                 ) : (
                     <EmptyState searchQuery={searchQuery} onClear={() => setSearchQuery('')} />
                 )}
             </main>
+
+            {/* User Profile Modal Overlay */}
+            {selectedUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+                    <div 
+                        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
+                        onClick={() => setSelectedUser(null)}
+                    ></div>
+                    <div className="relative w-full max-w-md my-auto animate-in fade-in zoom-in-95 duration-200">
+                        <div className="h-full max-h-[85vh] overflow-y-auto rounded-[2rem] scrollbar-hide shadow-2xl ring-1 ring-white/10 relative">
+                            <button 
+                                onClick={() => setSelectedUser(null)}
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-800 backdrop-blur-md rounded-full transition-all z-[100] shadow-xl border border-white/10"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <DarkGlassCard
+                                user={selectedUser}
+                                currentUser={currentUser}
+                                onDelete={(id) => {
+                                    handleDeleteUser(id);
+                                    setSelectedUser(null);
+                                }}
+                                onConnect={handleConnect}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -256,14 +238,34 @@ export default function Users() {
  * REUSABLE DARK GLASS COMPONENTS
  */
 
-const ViewToggle = ({ active, onClick, icon }) => (
-    <button
-        onClick={onClick}
-        className={`p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] border border-white/20' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}
-    >
-        {icon}
-    </button>
-);
+const InstagramStyleRow = ({ user, onClick }) => {
+    const isAvailable = user.availability !== 'busy';
+    return (
+        <div 
+            onClick={onClick}
+            className="flex items-center gap-4 py-3 px-4 hover:bg-white/[0.04] active:bg-white/[0.08] rounded-2xl cursor-pointer transition-colors group"
+        >
+            <div className="relative shrink-0">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-white font-bold text-xl shadow-lg border border-white/5">
+                    {user.name?.charAt(0).toUpperCase() || '?'}
+                </div>
+                {isAvailable ? (
+                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#020617] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                ) : (
+                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-rose-500 border-2 border-[#020617] rounded-full shadow-[0_0_8px_rgba(244,63,94,0.5)]"></div>
+                )}
+            </div>
+            <div className="flex-1 min-w-0">
+                <h3 className="text-slate-100 font-semibold text-base truncate group-hover:text-white transition-colors">
+                    {user.name}
+                </h3>
+                <p className="text-slate-400 text-[13px] truncate font-medium">
+                    {isAvailable ? 'Active now' : 'Busy'} • {user.email.split('@')[0]}
+                </p>
+            </div>
+        </div>
+    );
+};
 
 const StatusBadge = ({ availability }) => {
     // Default to available if status is null, undefined, or 'available'
