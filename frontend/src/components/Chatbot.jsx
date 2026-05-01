@@ -137,36 +137,42 @@ const Chatbot = () => {
         if (isOpen) inputRef.current?.focus();
     }, [messages, isTyping, isOpen]);
 
-    const callBytez = async (userQuery) => {
-        const testKey = "your-free-key";
-        const bytezKey = import.meta.env.VITE_BYTEZ_API_KEY || testKey;
-        const sdk = new Bytez(bytezKey);
-        const model = sdk.model("openai/gpt-5.3-chat-latest");
+    const callGroq = async (userQuery) => {
+        const groqKey = import.meta.env.VITE_GROQ_API_KEY;
         
-        const enrichedPrompt = `Context: User is at ${skillLevel} level.\nSystem Instructions: ${systemPrompt}\nUser Message: ${userQuery}`;
+        if (!groqKey) {
+            return "⚠️ **Setup Required:** To enable my AI features, please create a free account at [Groq.com](https://console.groq.com), get an API key, and configure `VITE_GROQ_API_KEY` in your `.env` file.";
+        }
+        
+        const enrichedPrompt = `Context: User is at ${skillLevel} level.\nSystem Instructions: ${systemPrompt}`;
 
         let retries = 0;
         const delays = [1000, 2000, 4000];
 
         while (retries < 3) {
             try {
-                const { error, output } = await model.run([
-                    {
-                        "role": "user",
-                        "content": enrichedPrompt
-                    }
-                ]);
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${groqKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: [
+                            { role: 'system', content: enrichedPrompt },
+                            { role: 'user', content: userQuery }
+                        ]
+                    })
+                });
 
-                if (error) {
-                    throw new Error(error);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData?.error?.message || `HTTP error! status: ${response.status}`);
                 }
-                
-                // Return output. Handle various bytez output structures cleanly.
-                if (typeof output === 'string') return output;
-                if (output?.content) return output.content;
-                if (output?.[0]?.content) return output[0].content;
-                if (output?.choices?.[0]?.message?.content) return output.choices[0].message.content;
-                return JSON.stringify(output);
+
+                const data = await response.json();
+                return data.choices[0].message.content;
             } catch (error) {
                 if (retries === 2) throw error;
                 await new Promise(resolve => setTimeout(resolve, delays[retries]));
@@ -190,7 +196,7 @@ const Chatbot = () => {
         setIsTyping(true);
 
         try {
-            const botResponseText = await callBytez(textToSend);
+            const botResponseText = await callGroq(textToSend);
 
             const botMessage = {
                 text: botResponseText || "System Error: Response stream interrupted. Please retry.",
